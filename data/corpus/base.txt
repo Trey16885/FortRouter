@@ -1,0 +1,69 @@
+FortRouter is a free, self-hosted AI platform. It runs entirely on your own computer, gives you API keys you control, and hosts a family of small Fort models trained through tokenization on a local corpus. Nothing leaves your machine, and every model is free to use.
+
+Tokenization is the process of breaking text into small reusable pieces called tokens. FortRouter uses byte pair encoding, which starts from single characters and repeatedly merges the most frequent pair of neighboring symbols. After a few hundred merges the tokenizer learns common chunks of words, and the models predict the next token from the tokens that came before it.
+
+Fine tuning means continuing to train a model on new text after its base training is done. In FortRouter, fine tuning feeds new paragraphs through the shared tokenizer and folds the token counts into the model with extra weight, so the new material shows up strongly in later generations. Fine tuned text is screened by the safety layer before it is accepted.
+
+Fort 1 Flash is the fastest model in the family. It uses a short context window and a small sampling budget, which makes it best for quick answers, casual questions, and short drafts. Flash is free, like every Fort model.
+
+Fort 1 Thinking is the reasoning model. Before it answers, it searches the local research index for relevant passages, shows the passages it found, and then generates its answer with a longer context window than Flash. Thinking is free and works well for questions about subjects covered in the corpus.
+
+Fort 1 Pro is the largest text model in the family. It runs a deeper research pass, retrieves more passages, uses the longest context window, and generates the longest answers. Pro is a beast on subjects the corpus knows about, and it is still completely free.
+
+Fort Gen 1 I is the image generation model. It turns a text prompt into a deterministic piece of procedural vector art. Keywords in the prompt steer the color palette, and every image carries a small watermark noting that it is AI generated.
+
+Fort Gen 1 V is the video generation model. It works like Fort Gen 1 I but animates the composition, producing a looping motion piece a few seconds long that plays in any browser. Video generation is free and runs locally like everything else.
+
+The safety layer sits in front of every model. It enforces the core guidelines: no help with violence or weapons, care and real resources for anyone considering self harm, no hateful or harassing content, no clearly illegal activity such as malware or fraud, and absolutely no sexual content involving minors. The same screen is applied to prompts, to generated output, and to fine tuning uploads.
+
+An API key in FortRouter looks like fort followed by forty hexadecimal characters. Only a hash of the key is stored on disk, so the full key is shown exactly once when it is created. Keys can be named, listed, and revoked from the dashboard or the API, and each key tracks how many requests it has made.
+
+Artificial intelligence is the study of building systems that perform tasks that normally require human intelligence, such as understanding language, recognizing images, and making decisions. Modern AI systems are trained on data rather than programmed rule by rule, and language models in particular learn statistical patterns over tokens.
+
+A language model assigns probabilities to sequences of tokens. Given the tokens so far, it predicts a distribution over the next token and samples from it. Large neural language models use transformers with billions of parameters, while small statistical models like the Fort family use n-gram counts with backoff, which are tiny, fast, and fully inspectable.
+
+Neural networks are computing systems inspired by the brain. They are built from layers of simple units that each compute a weighted sum followed by a nonlinearity. Training adjusts the weights with gradient descent so that the network's outputs move closer to the desired answers on the training data.
+
+The transformer architecture, introduced in 2017, processes all tokens in a sequence at once using an operation called attention, which lets every token look at every other token and decide what is relevant. Transformers replaced recurrent networks for language tasks because they train efficiently on parallel hardware and scale well with data.
+
+Computers store all information as binary digits called bits. Eight bits make a byte, and larger structures such as numbers, text, images, and programs are all built from bytes. A processor executes simple instructions billions of times per second, and everything a computer does reduces to those instructions.
+
+The internet is a global network of networks that communicate using the Internet Protocol. Data is broken into packets, routed independently across many links, and reassembled at the destination. The web runs on top of the internet using HTTP, where browsers request pages from servers by URL.
+
+Open source software is software whose source code anyone can read, modify, and share. Communities of contributors maintain open source projects in the open, and much of the modern internet, from operating systems to web servers to programming languages, is built on open source foundations.
+
+The solar system consists of the sun and everything bound to it by gravity: eight planets, dozens of moons, and countless asteroids and comets. The four inner planets are small and rocky, while the four outer planets are giants made mostly of gas and ice. Light from the sun takes about eight minutes to reach Earth.
+
+Mars is the fourth planet from the sun, a cold desert world with a thin carbon dioxide atmosphere. Its red color comes from iron oxide in its soil. Mars has the largest volcano in the solar system, Olympus Mons, and evidence suggests liquid water flowed on its surface billions of years ago.
+
+A star is a massive sphere of plasma held together by gravity, producing energy by nuclear fusion in its core. Stars form when clouds of gas and dust collapse, shine for millions to trillions of years depending on their mass, and end as white dwarfs, neutron stars, or black holes.
+
+A black hole is a region of space where gravity is so strong that nothing, not even light, can escape once it crosses the event horizon. Black holes form when very massive stars collapse at the end of their lives, and supermassive black holes sit at the centers of most galaxies, including our own.
+
+The ocean covers about seventy percent of Earth's surface and holds ninety seven percent of its water. It drives weather and climate, absorbs carbon dioxide, and produces much of the oxygen we breathe through photosynthetic plankton. Most of the deep ocean remains unexplored.
+
+Photosynthesis is the process by which plants, algae, and some bacteria convert sunlight, water, and carbon dioxide into sugar and oxygen. It is the foundation of nearly every food chain on Earth and the source of the oxygen in our atmosphere.
+
+DNA is the molecule that carries genetic instructions in living things. It is a double helix built from four bases, and the order of those bases encodes the proteins a cell can make. When cells divide, DNA is copied so each new cell carries the same instructions.
+
+Evolution by natural selection explains how species change over time. Individuals vary, some variations help survival and reproduction, and those variations become more common in the next generation. Over long spans of time this process produces the diversity of life on Earth.
+
+Climate describes the long term patterns of temperature and precipitation in a region, while weather is what happens day to day. Earth's climate is warming because greenhouse gases from burning fossil fuels trap heat in the atmosphere, and reducing emissions is the central challenge of climate policy.
+
+The Roman Empire grew from a city state in Italy to control the Mediterranean world for centuries. Roman engineering gave us roads, aqueducts, and concrete, Roman law shaped modern legal systems, and Latin became the ancestor of languages spoken by hundreds of millions of people today.
+
+The printing press, developed by Johannes Gutenberg around 1440, made books cheap enough for ordinary people to own. It spread literacy and new ideas across Europe, powered the Reformation and the Scientific Revolution, and is often called the most important invention of the last thousand years.
+
+The industrial revolution began in Britain in the late eighteenth century, when steam power and machine tools moved production from homes and workshops into factories. It transformed transportation, cities, and daily life, and set off the sustained economic growth that continues today.
+
+Programming is the craft of writing instructions for computers. A program is text in a programming language that a computer translates into actions. Good programs are correct first, then clear, then fast, and programmers spend more time reading and changing code than writing new code.
+
+JavaScript is the programming language of the web. It runs in every browser and, through Node.js, on servers as well. JavaScript is dynamically typed, event driven, and famous for its flexibility. FortRouter itself is written in plain Node.js with no external dependencies.
+
+Python is a programming language known for readable syntax and a huge ecosystem of libraries. It is the dominant language of data science and machine learning, and it is often the first language new programmers learn because simple programs stay simple to write.
+
+Music is organized sound. Melody is a sequence of pitches heard as a single line, harmony is the sound of pitches combined, and rhythm is the pattern of time between events. Every human culture makes music, and it appears in rituals, work, and play across all of recorded history.
+
+Coffee is one of the most consumed drinks in the world. The beans are the seeds of a fruit that grows in a belt around the equator, and they are roasted, ground, and brewed with hot water. Caffeine in coffee blocks the brain's sleepiness signal, which is why it helps people feel alert.
+
+Chess is a two player strategy game played on a sixty four square board. Each piece moves in its own way, and the goal is to trap the opponent's king in checkmate. Chess has been played for about fifteen hundred years, and modern chess engines are far stronger than any human player.

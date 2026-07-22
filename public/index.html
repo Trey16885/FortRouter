@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FortRouter — free self-hosted AI</title>
+<style>
+  :root {
+    --bg: #0c101c; --panel: #141a2c; --panel2: #1b2340; --line: #273056;
+    --text: #e8ecf7; --dim: #8a94b8; --accent: #5561d6; --accent2: #7fd1e8;
+    --good: #4cc38a; --warn: #f2b544; --bad: #e0533d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  header { display: flex; align-items: center; gap: 14px; padding: 16px 24px; border-bottom: 1px solid var(--line); }
+  header .logo { font-size: 22px; font-weight: 800; letter-spacing: .5px; }
+  header .logo span { color: var(--accent2); }
+  header .tag { color: var(--dim); font-size: 13px; }
+  nav { display: flex; gap: 6px; padding: 10px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  nav button { background: none; border: 1px solid transparent; color: var(--dim); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+  nav button.active { background: var(--panel2); color: var(--text); border-color: var(--line); }
+  main { max-width: 980px; margin: 0 auto; padding: 24px; }
+  section { display: none; }
+  section.active { display: block; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .card h3 { margin: 0 0 6px; font-size: 16px; }
+  .card .price { color: var(--good); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+  .card p { color: var(--dim); font-size: 13px; margin: 8px 0 0; line-height: 1.5; }
+  .card .stats { color: var(--dim); font-size: 11px; margin-top: 10px; font-family: ui-monospace, monospace; }
+  .row { display: flex; gap: 10px; margin: 14px 0; flex-wrap: wrap; align-items: center; }
+  select, input[type=text], input[type=number], textarea {
+    background: var(--panel2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: inherit;
+  }
+  textarea { width: 100%; min-height: 90px; resize: vertical; }
+  button.primary { background: var(--accent); border: none; color: white; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  button.primary:disabled { opacity: .5; cursor: wait; }
+  button.small { background: var(--panel2); border: 1px solid var(--line); color: var(--dim); padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .chat { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+  .msg { border-radius: 10px; padding: 12px 14px; max-width: 85%; white-space: pre-wrap; line-height: 1.5; font-size: 14px; }
+  .msg.user { background: var(--accent); align-self: flex-end; }
+  .msg.bot { background: var(--panel); border: 1px solid var(--line); align-self: flex-start; }
+  .msg.bot.refusal { border-color: var(--bad); }
+  .msg .meta { font-size: 11px; color: var(--dim); margin-bottom: 6px; font-family: ui-monospace, monospace; }
+  details.sources { margin-top: 8px; font-size: 12px; color: var(--dim); }
+  details.sources pre { white-space: pre-wrap; background: var(--panel2); padding: 8px; border-radius: 6px; }
+  .art { margin-top: 14px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+  .art svg { display: block; width: 100%; height: auto; }
+  table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--dim); font-weight: 600; }
+  code.key { background: var(--panel2); padding: 3px 8px; border-radius: 6px; font-size: 12px; word-break: break-all; }
+  .note { color: var(--dim); font-size: 13px; line-height: 1.6; }
+  .banner { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 13px; margin-bottom: 14px; }
+  ol.guidelines li { margin: 8px 0; line-height: 1.5; }
+  .ok { color: var(--good); } .err { color: var(--bad); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Fort<span>Router</span></div>
+  <div class="tag">free AI, hosted on your computer · tokenization-trained Fort models · API keys included</div>
+</header>
+<nav>
+  <button data-tab="models" class="active">Models</button>
+  <button data-tab="chat">Chat</button>
+  <button data-tab="studio">Image &amp; Video</button>
+  <button data-tab="finetune">Fine-tune</button>
+  <button data-tab="keys">API Keys</button>
+  <button data-tab="safety">Safety</button>
+</nav>
+<main>
+  <section id="tab-models" class="active">
+    <div class="banner">Every Fort model is <b class="ok">free</b> and runs entirely on this machine. Text models are trained here, at startup, with BPE tokenization over the local corpus — fine-tune them from the Fine-tune tab.</div>
+    <div class="cards" id="modelCards"></div>
+  </section>
+
+  <section id="tab-chat">
+    <div class="row">
+      <label for="chatModel">Model</label>
+      <select id="chatModel">
+        <option value="fort-1-flash">Fort 1 Flash — quick answers</option>
+        <option value="fort-1-thinking">Fort 1 Thinking — researches first</option>
+        <option value="fort-1-pro">Fort 1 Pro — the beast</option>
+      </select>
+    </div>
+    <div class="chat" id="chatLog"></div>
+    <div class="row">
+      <input type="text" id="chatInput" placeholder="Ask something…" style="flex:1" autocomplete="off">
+      <button class="primary" id="chatSend">Send</button>
+    </div>
+  </section>
+
+  <section id="tab-studio">
+    <div class="row">
+      <select id="genModel">
+        <option value="fort-gen-1-i">Fort Gen 1 I — image</option>
+        <option value="fort-gen-1-v">Fort Gen 1 V — video</option>
+      </select>
+      <input type="text" id="genPrompt" placeholder="a calm ocean at sunset…" style="flex:1" autocomplete="off">
+      <input type="number" id="genDur" min="2" max="30" value="6" title="video duration (s)" style="width:70px">
+      <button class="primary" id="genGo">Generate</button>
+    </div>
+    <div class="note">Fort Gen output is prompt-seeded procedural vector art, watermarked as AI-generated. Video is an animated loop that plays right here.</div>
+    <div id="genOut"></div>
+  </section>
+
+  <section id="tab-finetune">
+    <div class="banner">Paste text below to fine-tune <b>all three text models at once</b>. The text is tokenized with the shared BPE vocabulary, folded into every model's counts with extra weight, added to the research index, and saved so it survives restarts. Uploads are screened by the safety layer.</div>
+    <div class="row"><input type="text" id="ftName" placeholder="dataset name (optional)"></div>
+    <textarea id="ftText" placeholder="Paste at least 40 characters of training text…"></textarea>
+    <div class="row"><button class="primary" id="ftGo">Fine-tune models</button><span id="ftStatus" class="note"></span></div>
+  </section>
+
+  <section id="tab-keys">
+    <div class="banner">Keys look like <code class="key">fort-…</code>. Only a hash is stored, so each key is shown <b>once</b>. The dashboard made itself a key automatically; make more for your own apps and call <code class="key">POST /api/generate</code> with <code class="key">Authorization: Bearer fort-…</code></div>
+    <div class="row">
+      <input type="text" id="keyName" placeholder="key name (e.g. my-app)">
+      <button class="primary" id="keyCreate">Create key</button>
+    </div>
+    <div id="newKey"></div>
+    <table><thead><tr><th>Name</th><th>Prefix</th><th>Created</th><th>Requests</th><th></th></tr></thead><tbody id="keyRows"></tbody></table>
+  </section>
+
+  <section id="tab-safety">
+    <div class="banner">These core guidelines are enforced by code (<code class="key">lib/safety.js</code>) on every prompt, every generation, and every fine-tune upload, for every Fort model.</div>
+    <ol class="guidelines" id="guidelines"></ol>
+  </section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+
+/* tabs */
+document.querySelectorAll('nav button').forEach((b) => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach((x) => x.classList.remove('active'));
+  document.querySelectorAll('main section').forEach((x) => x.classList.remove('active'));
+  b.classList.add('active');
+  $('#tab-' + b.dataset.tab).classList.add('active');
+});
+
+/* API key bootstrap: the dashboard provisions itself a key once. */
+let apiKey = localStorage.getItem('fortKey');
+async function ensureKey() {
+  if (apiKey) return apiKey;
+  const r = await fetch('/api/keys', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'dashboard' }) });
+  apiKey = (await r.json()).key;
+  localStorage.setItem('fortKey', apiKey);
+  return apiKey;
+}
+async function api(path, opts = {}) {
+  await ensureKey();
+  const r = await fetch(path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey, ...(opts.headers || {}) },
+  });
+  if (r.status === 401) { localStorage.removeItem('fortKey'); apiKey = null; }
+  return r.json();
+}
+
+/* models tab */
+async function loadModels() {
+  const { models } = await (await fetch('/api/models')).json();
+  $('#modelCards').innerHTML = models.map((m) => `
+    <div class="card">
+      <div class="price">${m.price} · ${m.type}</div>
+      <h3>${m.name}</h3>
+      <p>${m.description}</p>
+      ${m.stats ? `<div class="stats">order-${m.stats.order} n-gram · ${m.stats.vocabSize} BPE tokens · ${m.stats.contexts.toLocaleString()} contexts · ${m.stats.trainedTokens.toLocaleString()} trained tokens</div>` : ''}
+    </div>`).join('');
+}
+
+/* chat tab */
+function addMsg(cls, html) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + cls;
+  div.innerHTML = html;
+  $('#chatLog').appendChild(div);
+  div.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function sendChat() {
+  const prompt = $('#chatInput').value.trim();
+  if (!prompt) return;
+  $('#chatInput').value = '';
+  const model = $('#chatModel').value;
+  addMsg('user', escapeHtml(prompt));
+  $('#chatSend').disabled = true;
+  try {
+    const r = await api('/api/generate', { method: 'POST', body: JSON.stringify({ model, prompt }) });
+    let html = `<div class="meta">${model}${r.refused ? ' · safety refusal' : ''}</div>` + escapeHtml(r.text || r.error || '(no output)');
+    if (r.thinking) html += `<details class="sources"><summary>thinking &amp; sources (${(r.sources||[]).length})</summary><pre>${escapeHtml(r.thinking + '\n\n' + (r.sources||[]).map((s) => `[${s.source} · score ${s.score}]\n${s.excerpt}`).join('\n\n'))}</pre></details>`;
+    addMsg('bot' + (r.refused ? ' refusal' : ''), html);
+  } catch (e) {
+    addMsg('bot refusal', escapeHtml('request failed: ' + e.message));
+  }
+  $('#chatSend').disabled = false;
+  $('#chatInput').focus();
+}
+$('#chatSend').onclick = sendChat;
+$('#chatInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(); });
+
+/* studio tab */
+$('#genGo').onclick = async () => {
+  const model = $('#genModel').value;
+  const prompt = $('#genPrompt').value.trim() || 'abstract composition';
+  $('#genGo').disabled = true;
+  const r = await api('/api/generate', { method: 'POST', body: JSON.stringify({ model, prompt, options: { duration: Number($('#genDur').value) } }) });
+  $('#genGo').disabled = false;
+  if (r.refused || r.error) { $('#genOut').innerHTML = `<div class="banner err">${escapeHtml(r.text || r.error)}</div>`; return; }
+  const art = r.image || r.video;
+  $('#genOut').innerHTML = `<div class="art">${art.svg}</div><div class="note">palette: ${art.palette} · ${art.format}${art.durationSeconds ? ' · ' + art.durationSeconds + 's loop' : ''}</div>`;
+};
+
+/* fine-tune tab */
+$('#ftGo').onclick = async () => {
+  const text = $('#ftText').value.trim();
+  $('#ftStatus').textContent = 'training…';
+  const r = await api('/api/finetune', { method: 'POST', body: JSON.stringify({ text, name: $('#ftName').value }) });
+  $('#ftStatus').innerHTML = r.error
+    ? `<span class="err">${escapeHtml(r.error)}</span>`
+    : `<span class="ok">done — ${r.tokensAdded} tokens folded into ${r.models.length} models (saved as ${escapeHtml(r.file)})</span>`;
+  if (!r.error) { $('#ftText').value = ''; loadModels(); }
+};
+
+/* keys tab */
+async function loadKeys() {
+  const r = await api('/api/keys');
+  $('#keyRows').innerHTML = (r.keys || []).map((k) => `
+    <tr><td>${escapeHtml(k.name)}</td><td><code class="key">${k.prefix}</code></td>
+    <td>${new Date(k.createdAt).toLocaleString()}</td><td>${k.requests}</td>
+    <td><button class="small" onclick="revokeKey('${k.id}')">revoke</button></td></tr>`).join('');
+}
+window.revokeKey = async (id) => { await api('/api/keys/' + id, { method: 'DELETE' }); loadKeys(); };
+$('#keyCreate').onclick = async () => {
+  const r = await fetch('/api/keys', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: $('#keyName').value || 'unnamed key' }) });
+  const d = await r.json();
+  $('#newKey').innerHTML = `<div class="banner">New key (copy it now — shown once): <code class="key">${d.key}</code></div>`;
+  $('#keyName').value = '';
+  loadKeys();
+};
+
+/* safety tab */
+fetch('/api/safety').then((r) => r.json()).then((d) => {
+  $('#guidelines').innerHTML = d.coreGuidelines.map((g) => `<li>${g}</li>`).join('');
+});
+
+ensureKey().then(() => { loadModels(); loadKeys(); });
+</script>
+</body>
+</html>

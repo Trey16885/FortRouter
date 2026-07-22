@@ -1,0 +1,4 @@
+# runtime state — never commit keys or user fine-tune uploads
+data/keys.json
+data/finetune/
+node_modules/
