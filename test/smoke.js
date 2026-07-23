@@ -53,16 +53,28 @@ ok('Flash answers quickly', () => {
   assert(r.text.length > 0);
   assert(!('sources' in r));
 });
-ok('Thinking researches and cites sources', () => {
+ok('Thinking researches, cites sources, and answers on topic', () => {
   const r = registry.generate('fort-1-thinking', 'tell me about black holes', { seed: 1 });
   assert(r.thinking);
   assert(r.sources.length > 0);
-  assert(r.sources[0].excerpt.toLowerCase().includes('black hole'));
+  assert.strictEqual(r.answerMode, 'grounded');
+  assert(r.text.toLowerCase().includes('black hole'));
 });
-ok('Pro retrieves more than Thinking', () => {
+ok('Pro retrieves more than Thinking and stays grounded', () => {
   const pro = registry.generate('fort-1-pro', 'planets in the solar system', { seed: 1 });
   assert(pro.sources.length >= 2);
-  assert(pro.text.length > 0);
+  assert.strictEqual(pro.answerMode, 'grounded');
+  assert(pro.text.toLowerCase().includes('planet'));
+});
+ok('grounded answer actually explains tokenization', () => {
+  const r = registry.generate('fort-1-pro', 'what is tokenization?', { seed: 1 });
+  assert.strictEqual(r.answerMode, 'grounded');
+  assert(/token/i.test(r.text));
+});
+ok('off-corpus questions fall back to freeform', () => {
+  const r = registry.generate('fort-1-pro', 'what is 1+1?', { seed: 1 });
+  assert.strictEqual(r.answerMode, 'freeform');
+  assert(r.thinking.includes('no relevant passages'));
 });
 ok('Gen 1 I makes deterministic watermarked SVG', () => {
   const a = registry.generate('fort-gen-1-i', 'ocean at sunset', { seed: 'x' });

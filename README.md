@@ -39,7 +39,10 @@ at a scale your laptop trains in milliseconds:
 These are honest small statistical models, not neural networks: fully
 inspectable, fully local, and genuinely trained on whatever you feed them.
 Thinking and Pro add a TF-IDF research pass (`lib/research.js`) over the
-corpus before answering, and cite the passages they used. Fort Gen 1 I/V
+corpus before answering: they compose the answer from the most relevant
+sentences they retrieved (`answerMode: "grounded"`), extend it with the
+model, and cite the passages they used. Off-corpus questions fall back to
+free-running generation (`answerMode: "freeform"`). Fort Gen 1 I/V
 (`lib/gen.js`) render prompt-seeded procedural SVG — the video variant
 animates and loops in any browser — and every output is watermarked as
 AI-generated.
